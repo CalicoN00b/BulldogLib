@@ -2,7 +2,9 @@ package net.calicoctl.bulldoglib;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -136,5 +138,26 @@ public class BulldogTalonFX {
     for (BulldogTalonFX motor : allMotors) {
       motor.update();
     }
+  }
+
+  /**
+   * Creates a copy of this BulldogTalonFX with the Follower Control Request.
+   * @param leaderID The ID of the motor to follow.
+   * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
+   * @return This motor, following the motor at the given ID.
+   */
+  public BulldogTalonFX withLeader(int leaderID, boolean opposeLeader) {
+    motor.setControl(new Follower(leaderID, opposeLeader ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned));
+    return this;
+  }
+
+  /**
+   * Creates a copy of this BulldogTalonFX with the Follower Control Request.
+   * @param leaderMotor The BulldogTalonFX to follow.
+   * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
+   * @return This motor, following the given {@link BulldogTalonFX}
+   */
+  public BulldogTalonFX withLeader(BulldogTalonFX leaderMotor, boolean opposeLeader) {
+    return this.withLeader(leaderMotor.motor.getDeviceID(), opposeLeader);
   }
 }
