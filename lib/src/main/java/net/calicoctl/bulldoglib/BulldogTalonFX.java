@@ -3,7 +3,13 @@ package net.calicoctl.bulldoglib;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.*;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -22,10 +28,14 @@ public class BulldogTalonFX {
   private double loggedPosition;
   private double loggedVelocity;
   private double loggedTempurature;
+  private boolean loggedConnected;
 
-  private final String name;
+  public final String name;
 
   private final LoggableInputs inputs;
+
+  private final Alert disconnectedAlert;
+  private final Debouncer alertDebouncer = new Debouncer(0.5, DebounceType.kFalling);
 
   /**
    * Creates a new BulldogTalonFX Wrapper with the given id, a default name, and default configs.
@@ -73,6 +83,7 @@ public class BulldogTalonFX {
             table.put("Position", loggedPosition);
             table.put("Velocity", loggedVelocity);
             table.put("Tempurature", loggedTempurature);
+            table.put("Connected", loggedConnected);
           }
 
           public void fromLog(LogTable table) {
@@ -81,8 +92,11 @@ public class BulldogTalonFX {
             loggedPosition = table.get("Position", 0);
             loggedVelocity = table.get("Velocity", 0);
             loggedTempurature = table.get("Tempurature", 0);
+            loggedConnected = table.get("Connected", false);
           }
         };
+
+    disconnectedAlert = new Alert(name + " disconnected!", AlertType.kWarning);
   }
 
   /**
@@ -98,8 +112,10 @@ public class BulldogTalonFX {
       loggedPosition = position.getValueAsDouble();
       loggedVelocity = velocity.getValueAsDouble();
       loggedTempurature = tempurature.getValueAsDouble();
+      loggedConnected = motor.isConnected();
     }
 
     Logger.processInputs("Motors/" + name, inputs);
+    disconnectedAlert.set(alertDebouncer.calculate(!loggedConnected));
   }
 }
