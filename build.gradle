@@ -1,26 +1,5 @@
 allprojects {
     repositories {
         mavenCentral()
-        maven {
-            // WPI
-            url 'https://frcmaven.wpi.edu/artifactory/release/'
-        }
-        maven {
-            // CTRE
-            url 'https://maven.ctr-electronics.com/release'
-        }
-        maven {
-            // REV Robotics
-            url 'https://maven.revrobotics.com/'
-        }
-        maven {
-            // PhotonVision
-            name 'photonvisionRepositoryRepository'
-            url 'https://maven.photonvision.org/releases'
-        }
-        maven {
-            // AdvantageKit
-            url = uri("https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release")
-        }
     }
 }
