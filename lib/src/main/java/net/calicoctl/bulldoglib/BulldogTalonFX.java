@@ -169,24 +169,25 @@ public class BulldogTalonFX {
   }
 
   /**
-   * Creates a copy of this BulldogTalonFX with the applied Slot0Configs.
-   * @param configs The Slot0Configs to apply.
-   * @return A copy of this BulldogTalonFX, with the applied Slot0Configs.
+   * Creates a copy of this BulldogTalonFX with the applied NeutralMode config.
+   * @param value {@code true} to enable brake mode, {@code false} to enable coast mode.
+   * @return A copy of this BulldogTalonFX, with the desired NeutralMode config.
    */
-  public BulldogTalonFX withSlot0Configs(Slot0Configs configs) {
-    config.Slot0 = configs;
+  public BulldogTalonFX withBrakeMode(boolean value) {
+    config.MotorOutput.NeutralMode = value ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     motor.getConfigurator().apply(config);
     return this;
   }
 
   /**
-   * Creates a copy of this BulldogTalonFX with the applied MotorOutputConfigs.
-   * @param configs The MotorOutputConfigs to apply.
-   * @return A copy of this BulldogTalonFX, with the applied MotorOutputConfigs.
+   * Creates a copy of this BulldogTalonFX with the applied InvertedMode config.
+   * @param value {@code true} for Clockwise_Positive, {@code false} for CounterClockwise_Postive.
+   * @return A copy of this BulldogTalonFX, with the desired InvertedMode config.
    */
-  public BulldogTalonFX withMotorOutputConfigs(MotorOutputConfigs configs) {
-    config.MotorOutput = configs;
+  public BulldogTalonFX withClockwisePositive(boolean value) {
+    config.MotorOutput.Inverted = value ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     motor.getConfigurator().apply(config);
     return this;
   }
+
 }
