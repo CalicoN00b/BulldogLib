@@ -1,7 +1,9 @@
 package net.calicoctl.bulldoglib;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -186,6 +188,33 @@ public class BulldogTalonFX {
     config.MotorOutput.Inverted = value ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     motor.getConfigurator().apply(config);
     return this;
+  }
+
+  /**
+   * Control the motor with the given ControlRequest.
+   * @param control The ControlRequest to pass to the motor.
+   * @see TalonFX#setControl(ControlRequest)
+   */
+  public void setControl(ControlRequest control) {
+    motor.setControl(control);
+  }
+
+  /**
+   * Resets the motor's position to the given value.
+   * @param position The angle to reset the motor to. Will be converted to Rotations.
+   * @see TalonFX#setPosition(Angle)
+   */
+  public void resetPosition(Angle position) {
+    motor.setPosition(position);
+  }
+
+  /**
+   * Resets the motor's position to the given value.
+   * @param position The position to reset the motor to, in Rotations.
+   * @see TalonFX#setPosition(Angle)
+   */
+  public void resetPosition(double position) {
+    motor.setPosition(position);
   }
 
 }
