@@ -10,11 +10,16 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class BulldogTalonFX {
+
+  private static final Set<BulldogTalonFX> allMotors = new HashSet<>();
 
   public final TalonFX motor;
   private final StatusSignal<Voltage> appliedVoltage;
@@ -30,7 +35,7 @@ public class BulldogTalonFX {
   private double loggedTempurature;
   private boolean loggedConnected;
 
-  public final String name;
+  private final String name;
 
   private final LoggableInputs inputs;
 
@@ -97,14 +102,16 @@ public class BulldogTalonFX {
         };
 
     disconnectedAlert = new Alert(name + " disconnected!", AlertType.kWarning);
+
+    allMotors.add(this);
   }
 
   /**
    * Updates the inputs of the motor and processes them.
-   *
-   * <p><strong>MUST</strong> be called periodically (once every loop).
+   * <p>
+   * Called periodically (every loop) as part of {@link BulldogTalonFX#updateAllMotors}
    */
-  public void updateAndProcessInputs() {
+  private void update() {
     // If the logger DOES have a replay source, the logged values will be updated from the logs.
     if (!Logger.hasReplaySource()) {
       loggedAppliedVoltage = appliedVoltage.getValueAsDouble();
@@ -117,5 +124,17 @@ public class BulldogTalonFX {
 
     Logger.processInputs("Motors/" + name, inputs);
     disconnectedAlert.set(alertDebouncer.calculate(!loggedConnected));
+  }
+
+  /**
+   * Updates and processes the inputs all ALL registered BulldogTalonFX's.
+   * <p>
+   * <strong>MUST</strong> be called periodically (once every loop).
+   * A convenient place to do so is in {@code Robot.robotPeriodic}.
+   */
+  public static void updateAllMotors() {
+    for (BulldogTalonFX motor : allMotors) {
+      motor.update();
+    }
   }
 }
