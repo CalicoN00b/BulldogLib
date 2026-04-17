@@ -1,10 +1,14 @@
 package net.calicoctl.bulldoglib;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -29,6 +33,8 @@ public class BulldogTalonFX {
   private final StatusSignal<Angle> position;
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<Temperature> tempurature;
+
+  private final TalonFXConfiguration config;
 
   private double loggedAppliedVoltage;
   private double loggedSupplyCurrernt;
@@ -79,6 +85,7 @@ public class BulldogTalonFX {
     tempurature = motor.getDeviceTemp();
 
     motor.getConfigurator().apply(config);
+    this.config = config;
 
     this.name = name;
 
@@ -141,10 +148,10 @@ public class BulldogTalonFX {
   }
 
   /**
-   * Creates a copy of this BulldogTalonFX with the Follower Control Request.
+   * Creates a copy of this BulldogTalonFX with the applied Follower ControlRequest.
    * @param leaderID The ID of the motor to follow.
    * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
-   * @return This motor, following the motor at the given ID.
+   * @return A copy of this BulldogTalonFX, following the motor at the given ID.
    */
   public BulldogTalonFX withLeader(int leaderID, boolean opposeLeader) {
     motor.setControl(new Follower(leaderID, opposeLeader ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned));
@@ -152,12 +159,34 @@ public class BulldogTalonFX {
   }
 
   /**
-   * Creates a copy of this BulldogTalonFX with the Follower Control Request.
+   * Creates a copy of this BulldogTalonFX with the applied Follower ControlRequest.
    * @param leaderMotor The BulldogTalonFX to follow.
    * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
-   * @return This motor, following the given {@link BulldogTalonFX}
+   * @return A copy of this BulldogTalonFX, following the given {@link BulldogTalonFX}
    */
   public BulldogTalonFX withLeader(BulldogTalonFX leaderMotor, boolean opposeLeader) {
     return this.withLeader(leaderMotor.motor.getDeviceID(), opposeLeader);
+  }
+
+  /**
+   * Creates a copy of this BulldogTalonFX with the applied Slot0Configs.
+   * @param configs The Slot0Configs to apply.
+   * @return A copy of this BulldogTalonFX, with the applied Slot0Configs.
+   */
+  public BulldogTalonFX withSlot0Configs(Slot0Configs configs) {
+    config.Slot0 = configs;
+    motor.getConfigurator().apply(config);
+    return this;
+  }
+
+  /**
+   * Creates a copy of this BulldogTalonFX with the applied MotorOutputConfigs.
+   * @param configs The MotorOutputConfigs to apply.
+   * @return A copy of this BulldogTalonFX, with the applied MotorOutputConfigs.
+   */
+  public BulldogTalonFX withMotorOutputConfigs(MotorOutputConfigs configs) {
+    config.MotorOutput = configs;
+    motor.getConfigurator().apply(config);
+    return this;
   }
 }
