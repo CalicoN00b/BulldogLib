@@ -1,10 +1,10 @@
 package net.calicoctl.bulldoglib;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -16,16 +16,24 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
+/**
+ * A wrapper class for {@link TalonFX}.
+ * Uses the <a href="https://github.com/Mechanical-Advantage/AdvantageKit">AdvantageKit</a> library to log many aspects of the motor,
+ * and will automatically alert the user if a motor becomes disconnected.
+ * 
+ * @author Ian Galaviz
+ * @version April 27, 2026
+ */
 public class BulldogTalonFX {
 
-  private static final Set<BulldogTalonFX> allMotors = new HashSet<>();
+  private static final List<BulldogTalonFX> allMotors = new LinkedList<>();
 
   public final TalonFX motor;
   private final StatusSignal<Voltage> appliedVoltage;
@@ -53,7 +61,7 @@ public class BulldogTalonFX {
   /**
    * Creates a new BulldogTalonFX Wrapper with the given id, a default name, and default configs.
    *
-   * @param id The id of the TalonFX
+   * @param id The id of the TalonFX.
    */
   public BulldogTalonFX(int id) {
     this(id, "Motor" + id);
@@ -62,8 +70,8 @@ public class BulldogTalonFX {
   /**
    * Creates a new BulldogTalonFX Wrapper with the given id, the given name, and default configs.
    *
-   * @param id The id of the TalonFX
-   * @param name The name of the BulldogTalonFX
+   * @param id The id of the TalonFX.
+   * @param name The name of the BulldogTalonFX.
    */
   public BulldogTalonFX(int id, String name) {
     this(id, name, new TalonFXConfiguration());
@@ -72,9 +80,9 @@ public class BulldogTalonFX {
   /**
    * Creates a new BulldogTalonFX Wrapper with the given id, the given name, and the given configs.
    *
-   * @param id The id of the TalonFX
-   * @param name The name of the BulldogTalonFX
-   * @param config The configs to give to the TalonFX
+   * @param id The id of the TalonFX.
+   * @param name The name of the BulldogTalonFX.
+   * @param config The configs to give to the TalonFX.
    */
   public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
     motor = new TalonFX(id);
@@ -116,7 +124,7 @@ public class BulldogTalonFX {
   }
 
   /**
-   * Updates the inputs of the motor and processes them.
+   * Updates and processes the inputs of the motor. Also will alert the user if the motor is disconnected.
    * <p>
    * Called periodically (every loop) as part of {@link BulldogTalonFX#updateAllMotors}
    */
@@ -162,7 +170,7 @@ public class BulldogTalonFX {
    * Creates a copy of this BulldogTalonFX with the applied Follower ControlRequest.
    * @param leaderMotor The BulldogTalonFX to follow.
    * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
-   * @return A copy of this BulldogTalonFX, following the given {@link BulldogTalonFX}
+   * @return A copy of this BulldogTalonFX, following the given BulldogTalonFX
    */
   public BulldogTalonFX withLeader(BulldogTalonFX leaderMotor, boolean opposeLeader) {
     return this.withLeader(leaderMotor.motor.getDeviceID(), opposeLeader);
@@ -191,6 +199,22 @@ public class BulldogTalonFX {
   }
 
   /**
+   * Set the speed of the motor.
+   * @param output The speed to set. Must be between [-1.0, 1.0].
+   * @see TalonFX#set(double)
+   */
+  public void set(double output) {
+    motor.set(output);
+  }
+
+  /**
+   * Requests neutral output of the motor.
+   */
+  public void stop() {
+    setControl(new NeutralOut());
+  }
+
+  /**
    * Control the motor with the given ControlRequest.
    * @param control The ControlRequest to pass to the motor.
    * @see TalonFX#setControl(ControlRequest)
@@ -215,6 +239,54 @@ public class BulldogTalonFX {
    */
   public void resetPosition(double position) {
     motor.setPosition(position);
+  }
+
+  /**
+   * Gets the applied voltage to the motor.
+   * @return The applied voltage, in Volts.
+   */
+  public double getAppliedVoltage() {
+    return loggedAppliedVoltage;
+  }
+
+  /**
+   * Gets the supply current of the motor.
+   * @return The supply current, in Amps.
+   */
+  public double getSupplyCurrent() {
+    return loggedSupplyCurrernt;
+  }
+
+  /**
+   * Gets the position of the motor.
+   * @return The position, in Rotations.
+   */
+  public double getPosition() {
+    return loggedPosition;
+  }
+
+  /**
+   * Gets the velocity of the motor.
+   * @return The velocity, in Rotations per Second.
+   */
+  public double getVelocity() {
+    return loggedVelocity;
+  }
+
+  /**
+   * Gets the tempurature of the motor.
+   * @return The tempurature, in Celsius.
+   */
+  public double getTempurature() {
+    return loggedTempurature;
+  }
+
+  /**
+   * Returns whether the motor is connected to the robot.
+   * @return {@code true} if the motor is connected, {@code false} otherwise.
+   */
+  public boolean isConnected() {
+    return loggedConnected;
   }
 
 }
