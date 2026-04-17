@@ -1,5 +1,105 @@
 package net.calicoctl.bulldoglib;
 
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.*;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
 public class BulldogTalonFX {
-    
+
+  public final TalonFX motor;
+  private final StatusSignal<Voltage> appliedVoltage;
+  private final StatusSignal<Current> supplyCurrent;
+  private final StatusSignal<Angle> position;
+  private final StatusSignal<AngularVelocity> velocity;
+  private final StatusSignal<Temperature> tempurature;
+
+  private double loggedAppliedVoltage;
+  private double loggedSupplyCurrernt;
+  private double loggedPosition;
+  private double loggedVelocity;
+  private double loggedTempurature;
+
+  private final String name;
+
+  private final LoggableInputs inputs;
+
+  /**
+   * Creates a new BulldogTalonFX Wrapper with the given id, a default name, and default configs.
+   *
+   * @param id The id of the TalonFX
+   */
+  public BulldogTalonFX(int id) {
+    this(id, "Motor" + id);
+  }
+
+  /**
+   * Creates a new BulldogTalonFX Wrapper with the given id, the given name, and default configs.
+   *
+   * @param id The id of the TalonFX
+   * @param name The name of the BulldogTalonFX
+   */
+  public BulldogTalonFX(int id, String name) {
+    this(id, name, new TalonFXConfiguration());
+  }
+
+  /**
+   * Creates a new BulldogTalonFX Wrapper with the given id, the given name, and the given configs.
+   *
+   * @param id The id of the TalonFX
+   * @param name The name of the BulldogTalonFX
+   * @param config The configs to give to the TalonFX
+   */
+  public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
+    motor = new TalonFX(id);
+    appliedVoltage = motor.getMotorVoltage();
+    supplyCurrent = motor.getSupplyCurrent();
+    position = motor.getPosition();
+    velocity = motor.getVelocity();
+    tempurature = motor.getDeviceTemp();
+
+    motor.getConfigurator().apply(config);
+
+    this.name = name;
+
+    inputs =
+        new LoggableInputs() {
+          public void toLog(LogTable table) {
+            table.put("AppliedVoltage", loggedAppliedVoltage);
+            table.put("SupplyCurrent", loggedSupplyCurrernt);
+            table.put("Position", loggedPosition);
+            table.put("Velocity", loggedVelocity);
+            table.put("Tempurature", loggedTempurature);
+          }
+
+          public void fromLog(LogTable table) {
+            loggedAppliedVoltage = table.get("AppliedVoltage", 0);
+            loggedSupplyCurrernt = table.get("SupplyCurrent", 0);
+            loggedPosition = table.get("Position", 0);
+            loggedVelocity = table.get("Velocity", 0);
+            loggedTempurature = table.get("Tempurature", 0);
+          }
+        };
+  }
+
+  /**
+   * Updates the inputs of the motor and processes them.
+   *
+   * <p><strong>MUST</strong> be called periodically (once every loop).
+   */
+  public void updateAndProcessInputs() {
+    // If the logger DOES have a replay source, the logged values will be updated from the logs.
+    if (!Logger.hasReplaySource()) {
+      loggedAppliedVoltage = appliedVoltage.getValueAsDouble();
+      loggedSupplyCurrernt = supplyCurrent.getValueAsDouble();
+      loggedPosition = position.getValueAsDouble();
+      loggedVelocity = velocity.getValueAsDouble();
+      loggedTempurature = tempurature.getValueAsDouble();
+    }
+
+    Logger.processInputs("Motors/" + name, inputs);
+  }
 }
