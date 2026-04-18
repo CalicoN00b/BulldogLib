@@ -1,7 +1,10 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
+    id 'maven-publish'
 }
+
+version = '1.0.0'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -45,4 +48,38 @@ tasks.named('jar') {
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+javadoc {
+    destinationDir = file("${buildDir}/docs/")
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+publishing {
+    publications {
+        bulldoglib(MavenPublication) {
+            groupId = 'net.calicoctl.bulldoglib'
+            artifactId = 'bulldoglib'
+            from components.java
+            artifact sourceJar
+            pom {
+                name = 'BulldogLib'
+                description = 'Library of code used by FRC Team 5933'
+                developers {
+                    developer {
+                        id = 'calico'
+                        name = 'ian'
+                    }
+                }
+                organization {
+                    name = "JudgeMent Call Robotics"
+                    url = 'https://github.com/jmchs-robotics'
+                }
+            }
+        }
+    }
 }

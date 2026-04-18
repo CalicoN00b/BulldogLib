@@ -27,9 +27,6 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  * A wrapper class for {@link TalonFX}.
  * Uses the <a href="https://github.com/Mechanical-Advantage/AdvantageKit">AdvantageKit</a> library to log many aspects of the motor,
  * and will automatically alert the user if a motor becomes disconnected.
- * 
- * @author Ian Galaviz
- * @version April 27, 2026
  */
 public class BulldogTalonFX {
 
