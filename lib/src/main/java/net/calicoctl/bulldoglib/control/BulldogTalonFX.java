@@ -1,4 +1,4 @@
-package net.calicoctl.bulldoglib;
+package net.calicoctl.bulldoglib.control;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;

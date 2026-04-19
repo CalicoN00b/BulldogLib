@@ -60,3 +60,9 @@ If you have followed the steps to add this repository as a submodule and to add 
 .\gradlew.bat :BulldogLib:lib:javadoc
 start .\BulldogLib\lib\build\docs\index.html
 ```
+
+# Dependencies
+
+This library relies on some vendordeps that must also be present in the root robot directory in order to function:
+- Phoenix6
+- AdvantageKit
