@@ -2,6 +2,12 @@
 
 Library of code to be used for the convencience of FRC Team 5933: JudgeMent Call Robotics.
 
+# Dependencies
+
+This library relies on some vendordeps that must also be present in the root robot directory in order to function:
+- Phoenix6
+- AdvantageKit
+
 # Adding Repository as a Submodule
 
 To add this repository as a submodule, go to the root robot code directory and type in these commands:
@@ -18,7 +24,7 @@ In order to make this library, first go to the `settings.gradle` of the root rob
 
 includeBuild('BulldogLib') {
     dependencySubstitution {
-        substitute module('net.calicoctl:bulldoglib') using project(':lib')
+        substitute module('net.calicoctl:bulldoglib') using project(':bulldoglib')
     }
 }
 ```
@@ -36,7 +42,7 @@ dependencies {
 Then, to make sure that the library jars are generated before GradleRIO will refer to them, add this line of code anywhere in the root robot directory's `build.gradle` file:
 
 ```gradle
-downloadDepsPreemptively.dependsOn gradle.includedBuild('BulldogLib').task(':lib:jar')
+downloadDepsPreemptively.dependsOn gradle.includedBuild('BulldogLib').task(':bulldoglib:jar')
 ```
 
 Finally, rebuild the code from the robot root directory and the library will be ready to use.
@@ -67,12 +73,6 @@ start .\lib\build\docs\index.html
 If you have followed the steps to add this repository as a submodule and to add it to Gradle, you can generate and view the javadocs by typing these two commands into your terminal:
 
 ```
-.\gradlew.bat :BulldogLib:lib:javadoc
+.\gradlew.bat :BulldogLib:bulldoglib:javadoc
 start .\BulldogLib\lib\build\docs\index.html
 ```
-
-# Dependencies
-
-This library relies on some vendordeps that must also be present in the root robot directory in order to function:
-- Phoenix6
-- AdvantageKit

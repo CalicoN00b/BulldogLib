@@ -6,4 +6,4 @@
  */
 
 rootProject.name = 'BulldogLib'
-include('lib')
+include('bulldoglib')

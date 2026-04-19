@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
@@ -60,32 +61,43 @@ public class BulldogTalonFX {
   private final Debouncer alertDebouncer = new Debouncer(0.5, DebounceType.kFalling);
 
   /**
-   * Creates a new BulldogTalonFX Wrapper with the given id, a default name, and default configs.
+   * Creates a new BulldogTalonFX Wrapper with the given ID, a default name, and default configs.
    *
-   * @param id The id of the TalonFX.
+   * @param id The ID of the TalonFX.
+   * @throws IllegalArgumentException if the ID is not between [0, 62].
    */
   public BulldogTalonFX(int id) {
     this(id, "Motor" + id);
   }
 
   /**
-   * Creates a new BulldogTalonFX Wrapper with the given id, the given name, and default configs.
+   * Creates a new BulldogTalonFX Wrapper with the given ID, the given name, and default configs.
    *
-   * @param id The id of the TalonFX.
+   * @param id The ID of the TalonFX.
    * @param name The name of the BulldogTalonFX.
+   * @throws IllegalArgumentException if the ID is not between [0, 62].
+   * @throws IllegalArgumentException if the name is empty or null.
    */
   public BulldogTalonFX(int id, String name) {
     this(id, name, new TalonFXConfiguration());
   }
 
   /**
-   * Creates a new BulldogTalonFX Wrapper with the given id, the given name, and the given configs.
+   * Creates a new BulldogTalonFX Wrapper with the given ID, the given name, and the given configs.
    *
-   * @param id The id of the TalonFX.
+   * @param id The ID of the TalonFX.
    * @param name The name of the BulldogTalonFX.
    * @param config The configs to give to the TalonFX.
+   * @throws IllegalArgumentException if the ID is not between [0, 62].
+   * @throws IllegalArgumentException if the name is empty or null.
+   * @throws NullPointerException if the config is null.
    */
   public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
+    if (id < 0 || id > 62) throw new IllegalArgumentException("CAN ID must be between [0, 62]!");
+    if (name == null || name.length() == 0) throw new IllegalArgumentException("A BulldogTalonFX must have a name!");
+    
+    this.config = Objects.requireNonNull(config, "Config must not be null!");
+
     motor = new TalonFX(id);
     appliedVoltage = motor.getMotorVoltage();
     supplyCurrent = motor.getSupplyCurrent();
@@ -93,8 +105,7 @@ public class BulldogTalonFX {
     velocity = motor.getVelocity();
     tempurature = motor.getDeviceTemp();
 
-    motor.getConfigurator().apply(config);
-    this.config = config;
+    motor.getConfigurator().apply(this.config);
 
     this.name = name;
 
@@ -159,10 +170,12 @@ public class BulldogTalonFX {
   /**
    * Creates a copy of this BulldogTalonFX with the applied Follower ControlRequest.
    * @param leaderID The ID of the motor to follow.
-   * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
+   * @param opposeLeader {@code true} to oppose the output of the leader, {@code false} to align to the output of the leader.
    * @return A copy of this BulldogTalonFX, following the motor at the given ID.
+   * @throws IllegalArgumentException if the motor is trying to follow itself (i.e. leaderID equals the backing motor's ID).
    */
   public BulldogTalonFX withLeader(int leaderID, boolean opposeLeader) {
+    if (leaderID == motor.getDeviceID()) throw new IllegalArgumentException("A motor cannot follow itself!");
     motor.setControl(new Follower(leaderID, opposeLeader ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned));
     return this;
   }
@@ -170,11 +183,13 @@ public class BulldogTalonFX {
   /**
    * Creates a copy of this BulldogTalonFX with the applied Follower ControlRequest.
    * @param leaderMotor The BulldogTalonFX to follow.
-   * @param opposeLeader Whether to copy the output of the leader, or to be opposite of the leader.
+   * @param opposeLeader {@code true} to oppose the output of the leader, {@code false} to align to the output of the leader.
    * @return A copy of this BulldogTalonFX, following the given BulldogTalonFX
+   * @throws IllegalArgumentException if the motor is trying to follow itself.
+   * @throws NullPointerException if trying to follow a null motor.
    */
   public BulldogTalonFX withLeader(BulldogTalonFX leaderMotor, boolean opposeLeader) {
-    return this.withLeader(leaderMotor.motor.getDeviceID(), opposeLeader);
+    return this.withLeader(Objects.requireNonNull(leaderMotor, "Cannot follow a null motor!").motor.getDeviceID(), opposeLeader);
   }
 
   /**
@@ -201,10 +216,12 @@ public class BulldogTalonFX {
 
   /**
    * Set the speed of the motor.
-   * @param output The speed to set. Must be between [-1.0, 1.0].
+   * @param output The speed to set. Should be between [-1.0, 1.0].
    * @see TalonFX#set(double)
    */
   public void set(double output) {
+    if (output < -1) output = -1;
+    else if (output > 1) output = 1;
     motor.set(output);
   }
 
@@ -218,19 +235,21 @@ public class BulldogTalonFX {
   /**
    * Control the motor with the given ControlRequest.
    * @param control The ControlRequest to pass to the motor.
+   * @throws NullPointerException if trying to follow a null ControlRequest.
    * @see TalonFX#setControl(ControlRequest)
    */
   public void setControl(ControlRequest control) {
-    motor.setControl(control);
+    motor.setControl(Objects.requireNonNull(control, "ControlRequest must not be null!"));
   }
 
   /**
    * Resets the motor's position to the given value.
    * @param position The angle to reset the motor to. Will be converted to Rotations.
+   * @throws NullPointerException if trying to reset to a null position.
    * @see TalonFX#setPosition(Angle)
    */
   public void resetPosition(Angle position) {
-    motor.setPosition(position);
+    motor.setPosition(Objects.requireNonNull(position, "Position must not be null!"));
   }
 
   /**
