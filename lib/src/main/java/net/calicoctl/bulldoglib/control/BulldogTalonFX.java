@@ -32,6 +32,10 @@ public class BulldogTalonFX {
 
   private static final List<BulldogTalonFX> allMotors = new LinkedList<>();
 
+  /** 
+   * The backing motor of this BulldogTalonFX.
+   * Should only be accessed to control the motor in a way the library has not accounted for.
+   */
   public final TalonFX motor;
   private final StatusSignal<Voltage> appliedVoltage;
   private final StatusSignal<Current> supplyCurrent;

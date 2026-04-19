@@ -41,6 +41,16 @@ downloadDepsPreemptively.dependsOn gradle.includedBuild('BulldogLib').task(':lib
 
 Finally, rebuild the code from the robot root directory and the library will be ready to use.
 
+# VSCode Jank
+
+Due to some oddities with VSCode, autocompletion may not work unless you add this line of code to the `.vscode/settings.json` in your root robot code directory:
+
+```
+"java.gradle.buildServer.enabled": "off"
+```
+
+This is not necessary, but if gradle builds fine but the library doesn't want to work in code, you may want to try this (assuming you followed the rest of the instructions correctly).
+
 # Library Javadocs
 
 ## Generating Javadocs Independently
