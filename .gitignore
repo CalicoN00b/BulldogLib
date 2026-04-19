@@ -15,3 +15,6 @@ hs_err_pid*
 
 # Personal Preferences
 .vscode/
+
+# Don't need CTRE's motor sim
+ctre_sim/

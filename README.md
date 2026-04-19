@@ -65,7 +65,7 @@ If you are just cloning this repository on its own, you can generate and view th
 
 ```
 .\gradlew.bat javadoc
-start .\lib\build\docs\index.html
+start .\bulldoglib\build\docs\index.html
 ```
 
 ## Generating When Cloned as a Submodule
@@ -74,5 +74,5 @@ If you have followed the steps to add this repository as a submodule and to add 
 
 ```
 .\gradlew.bat :BulldogLib:bulldoglib:javadoc
-start .\BulldogLib\lib\build\docs\index.html
+start .\BulldogLib\bulldoglib\build\docs\index.html
 ```
