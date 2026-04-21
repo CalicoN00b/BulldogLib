@@ -78,7 +78,7 @@ public class BulldogTalonFX {
    * @param id The ID of the TalonFX.
    * @param name The name of the BulldogTalonFX.
    * @throws IllegalArgumentException if the ID is not between [0, 62].
-   * @throws IllegalArgumentException if the name is empty or null.
+   * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
    */
   public BulldogTalonFX(int id, String name) {
     this(id, name, new TalonFXConfiguration());
@@ -91,12 +91,12 @@ public class BulldogTalonFX {
    * @param name The name of the BulldogTalonFX.
    * @param config The configs to give to the TalonFX.
    * @throws IllegalArgumentException if the ID is not between [0, 62].
-   * @throws IllegalArgumentException if the name is empty or null.
+   * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
    * @throws NullPointerException if the config is null.
    */
   public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
     if (id < 0 || id > 62) throw new IllegalArgumentException("CAN ID must be between [0, 62]!");
-    if (name == null || name.length() == 0) throw new IllegalArgumentException("A BulldogTalonFX must have a name!");
+    if (name == null || name.isBlank()) throw new IllegalArgumentException("A BulldogTalonFX must have a name!");
     
     this.config = Objects.requireNonNull(config, "Config must not be null!");
 
@@ -165,7 +165,7 @@ public class BulldogTalonFX {
    * Updates and processes the inputs all ALL registered BulldogTalonFX's.
    * <p>
    * <strong>MUST</strong> be called periodically (once every loop).
-   * A convenient place to do so is in {@code Robot.robotPeriodic}.
+   * A convenient place to do so is in {@code Robot.robotPeriodic()}.
    */
   public static void updateAllMotors() {
     for (BulldogTalonFX motor : allMotors) {
