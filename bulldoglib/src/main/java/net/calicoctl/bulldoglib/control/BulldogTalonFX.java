@@ -42,6 +42,7 @@ public class BulldogTalonFX {
   private final StatusSignal<Current> supplyCurrent;
   private final StatusSignal<Angle> position;
   private final StatusSignal<AngularVelocity> velocity;
+  private final StatusSignal<AngularVelocity> rotorVelocity;
   private final StatusSignal<Temperature> tempurature;
 
   private final TalonFXConfiguration config;
@@ -50,6 +51,7 @@ public class BulldogTalonFX {
   private double loggedSupplyCurrernt;
   private double loggedPosition;
   private double loggedVelocity;
+  private double loggedRotorVelocity;
   private double loggedTempurature;
   private boolean loggedConnected;
 
@@ -103,6 +105,7 @@ public class BulldogTalonFX {
     supplyCurrent = motor.getSupplyCurrent();
     position = motor.getPosition();
     velocity = motor.getVelocity();
+    rotorVelocity = motor.getRotorVelocity();
     tempurature = motor.getDeviceTemp();
 
     motor.getConfigurator().apply(this.config);
@@ -116,6 +119,7 @@ public class BulldogTalonFX {
             table.put("SupplyCurrent", loggedSupplyCurrernt);
             table.put("Position", loggedPosition);
             table.put("Velocity", loggedVelocity);
+            table.put("RotorVelocity", loggedRotorVelocity);
             table.put("Tempurature", loggedTempurature);
             table.put("Connected", loggedConnected);
           }
@@ -125,6 +129,7 @@ public class BulldogTalonFX {
             loggedSupplyCurrernt = table.get("SupplyCurrent", 0);
             loggedPosition = table.get("Position", 0);
             loggedVelocity = table.get("Velocity", 0);
+            loggedRotorVelocity = table.get("RotorVelocity", 0);
             loggedTempurature = table.get("Tempurature", 0);
             loggedConnected = table.get("Connected", false);
           }
@@ -147,6 +152,7 @@ public class BulldogTalonFX {
       loggedSupplyCurrernt = supplyCurrent.getValueAsDouble();
       loggedPosition = position.getValueAsDouble();
       loggedVelocity = velocity.getValueAsDouble();
+      loggedRotorVelocity = rotorVelocity.getValueAsDouble();
       loggedTempurature = tempurature.getValueAsDouble();
       loggedConnected = motor.isConnected();
     }
@@ -278,19 +284,30 @@ public class BulldogTalonFX {
   }
 
   /**
-   * Gets the position of the motor.
+   * Gets the position of the mechanism.
+   * This value IS affected by RotorToSensorRatio and SensorToMechanismRatio configs applied to the backing motor.
    * @return The position, in Rotations.
    */
-  public double getPosition() {
+  public double getMechanismPosition() {
     return loggedPosition;
   }
 
   /**
-   * Gets the velocity of the motor.
+   * Gets the velocity of the mechanism.
+   * This value IS affected by RotorToSensorRatio and SensorToMechanismRatio configs applied to the backing motor.
    * @return The velocity, in Rotations per Second.
    */
-  public double getVelocity() {
+  public double getMechanismVelocity() {
     return loggedVelocity;
+  }
+
+  /**
+   * Gets the velocity of the motor's rotor.
+   * This value is NOT affected by RotorToSensorRatio and SensorToMechanismRatio configs applied to the backing motor.
+   * @return The rotor velocity, in Rotations per Second.
+   */
+  public double getRotorVelocity() {
+    return loggedRotorVelocity;
   }
 
   /**
