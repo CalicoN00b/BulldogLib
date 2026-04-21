@@ -64,15 +64,33 @@ This is not necessary, but if gradle builds fine but the library doesn't want to
 If you are just cloning this repository on its own, you can generate and view the javadocs by typing these two commands into your terminal:
 
 ```
+# Windows
 .\gradlew.bat javadoc
 start .\bulldoglib\build\docs\index.html
+
+# Mac
+./gradlew javadoc
+open ./bulldoglib/build/docs/index.html
+
+# Linux
+./gradlew javadoc
+<browser> ./bulldoglib/build/docs/index.html # Replace <browser> with your broswer of choice, such as firefox
 ```
 
-## Generating When Cloned as a Submodule
+## Generating Javadocs When Cloned as a Submodule
 
 If you have followed the steps to add this repository as a submodule and to add it to Gradle, you can generate and view the javadocs by typing these two commands into your terminal:
 
 ```
+# Windows
 .\gradlew.bat :BulldogLib:bulldoglib:javadoc
 start .\BulldogLib\bulldoglib\build\docs\index.html
+
+# Mac
+./gradlew javadoc
+open ./BulldogLib/bulldoglib/build/docs/index.html
+
+# Linux
+./gradlew javadoc
+<browser> ./BulldogLib/bulldoglib/build/docs/index.html # Replace <browser> with your broswer of choice, such as firefox
 ```
