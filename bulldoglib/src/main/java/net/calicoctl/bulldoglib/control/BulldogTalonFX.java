@@ -1,6 +1,7 @@
 package net.calicoctl.bulldoglib.control;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import net.calicoctl.bulldoglib.util.BulldogTunableNumber;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +30,8 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  * A wrapper class for {@link TalonFX}.
  * Uses the <a href="https://github.com/Mechanical-Advantage/AdvantageKit">AdvantageKit</a> library to log many aspects of the motor,
  * and will automatically alert the user if a motor becomes disconnected.
+ * <p>
+ * If tuning is enabled for this motor, allows tuning of PID and Feedforward.
  */
 public class BulldogTalonFX {
 
@@ -59,6 +63,14 @@ public class BulldogTalonFX {
 
   private final LoggableInputs inputs;
 
+  private final BulldogTunableNumber kP;
+  private final BulldogTunableNumber kI;
+  private final BulldogTunableNumber kD;
+  private final BulldogTunableNumber kS;
+  private final BulldogTunableNumber kV;
+  private final BulldogTunableNumber kA;
+  private final BulldogTunableNumber kG;
+
   private final Alert disconnectedAlert;
   private final Debouncer alertDebouncer = new Debouncer(0.5, DebounceType.kFalling);
 
@@ -84,17 +96,23 @@ public class BulldogTalonFX {
     this(id, name, new TalonFXConfiguration());
   }
 
+  public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
+    this(id, name, config, false);
+  }
+
   /**
    * Creates a new BulldogTalonFX Wrapper with the given ID, the given name, and the given configs.
    *
    * @param id The ID of the TalonFX.
    * @param name The name of the BulldogTalonFX.
    * @param config The configs to give to the TalonFX.
+   * @param enableTuning Whether or not to enable tuning of the motor.
+   *    If enabled, will allow tuning of PID and Feedforward values.
    * @throws IllegalArgumentException if the ID is not between [0, 62].
    * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
    * @throws NullPointerException if the config is null.
    */
-  public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
+  public BulldogTalonFX(int id, String name, TalonFXConfiguration config, boolean enableTuning) {
     if (id < 0 || id > 62) throw new IllegalArgumentException("CAN ID must be between [0, 62]!");
     if (name == null || name.isBlank()) throw new IllegalArgumentException("A BulldogTalonFX must have a name!");
     
@@ -135,6 +153,15 @@ public class BulldogTalonFX {
           }
         };
 
+    Slot0Configs slot0Configs = this.config.Slot0;
+    kP = new BulldogTunableNumber(name + "/kP", slot0Configs.kP, enableTuning);
+    kI = new BulldogTunableNumber(name + "/kI", slot0Configs.kI, enableTuning);
+    kD = new BulldogTunableNumber(name + "/kD", slot0Configs.kD, enableTuning);
+    kS = new BulldogTunableNumber(name + "/kS", slot0Configs.kS, enableTuning);
+    kV = new BulldogTunableNumber(name + "/kV", slot0Configs.kV, enableTuning);
+    kA = new BulldogTunableNumber(name + "/kA", slot0Configs.kA, enableTuning);
+    kG = new BulldogTunableNumber(name + "/kG", slot0Configs.kG, enableTuning);
+
     disconnectedAlert = new Alert(name + " disconnected!", AlertType.kWarning);
 
     allMotors.add(this);
@@ -158,6 +185,23 @@ public class BulldogTalonFX {
     }
 
     Logger.processInputs("Motors/" + name, inputs);
+
+    BulldogTunableNumber.ifChanged(
+      hashCode(),
+      (values) -> {
+        config.Slot0 = config.Slot0
+          .withKP(values[0])
+          .withKI(values[1])
+          .withKD(values[2])
+          .withKS(values[3])
+          .withKV(values[4])
+          .withKA(values[5])
+          .withKG(values[6]);
+
+        motor.getConfigurator().apply(config);
+      }, 
+      kP, kI, kD, kS, kV, kA, kG);
+
     disconnectedAlert.set(alertDebouncer.calculate(!loggedConnected));
   }
 
