@@ -135,7 +135,7 @@ public class BulldogSparkFlex {
         allMotors.add(this);
     }
 
-    private void update() {
+    protected void update() {
         if (!Logger.hasReplaySource()) {
             loggedAppliedVoltage = motor.getAppliedOutput() * motor.getBusVoltage();
             loggedSupplyCurrent = motor.getOutputCurrent();
@@ -160,12 +160,6 @@ public class BulldogSparkFlex {
         );
 
         activeFaultAlert.set(alertDebouncer.calculate(loggedHasActiveFault));
-    }
-
-    public static void updateAllMotors() {
-        for (BulldogSparkFlex motor : allMotors) {
-            motor.update();
-        }
     }
 
     public BulldogSparkFlex withLeader(int leaderID, boolean opposeLeader) {

@@ -172,7 +172,7 @@ public class BulldogTalonFX {
    * <p>
    * Called periodically (every loop) as part of {@link BulldogTalonFX#updateAllMotors}
    */
-  private void update() {
+  protected void update() {
     // If the logger DOES have a replay source, the logged values will be updated from the logs.
     if (!Logger.hasReplaySource()) {
       loggedAppliedVoltage = appliedVoltage.getValueAsDouble();
@@ -203,18 +203,6 @@ public class BulldogTalonFX {
       kP, kI, kD, kS, kV, kA, kG);
 
     disconnectedAlert.set(alertDebouncer.calculate(!loggedConnected));
-  }
-
-  /**
-   * Updates and processes the inputs all ALL registered BulldogTalonFX's.
-   * <p>
-   * <strong>MUST</strong> be called periodically (once every loop).
-   * A convenient place to do so is in {@code Robot.robotPeriodic()}.
-   */
-  public static void updateAllMotors() {
-    for (BulldogTalonFX motor : allMotors) {
-      motor.update();
-    }
   }
 
   /**
