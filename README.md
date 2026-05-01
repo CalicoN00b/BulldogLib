@@ -9,18 +9,26 @@ This library relies on some vendordeps that must also be present in the root rob
 - AdvantageKit
 - REVLib
 
-# Adding Repository as a Submodule
+# Adding Repository as a Git Submodule
 
-To add this repository as a submodule, go to the root robot code directory and type in these commands:
+To add this repository as a git submodule, go to the root robot code directory and type in these commands:
 
 ```
 git submodule add https://github.com/CalicoN00b/BulldogLib
 git submodule update --init --recursive
 ```
 
-# Adding Submodule to Gradle
+# Updating Submodule
 
-In order to make this library, first go to the `settings.gradle` of the root robot code directory, and add these lines at the end:
+To update this repository after it has been added as a git submodule, go to the root robot code directory and type this command:
+
+```
+git submodule update --remote --recursive
+```
+
+# Adding Library to Gradle
+
+In order to use this library, first go to the `settings.gradle` of the root robot code directory, and add these lines at the end:
 ```gradle
 
 includeBuild('BulldogLib') {
