@@ -52,7 +52,7 @@ public class BulldogTalonFX {
   private final TalonFXConfiguration config;
 
   private double loggedAppliedVoltage;
-  private double loggedSupplyCurrernt;
+  private double loggedSupplyCurrent;
   private double loggedPosition;
   private double loggedVelocity;
   private double loggedRotorVelocity;
@@ -134,7 +134,7 @@ public class BulldogTalonFX {
         new LoggableInputs() {
           public void toLog(LogTable table) {
             table.put("AppliedVoltage", loggedAppliedVoltage);
-            table.put("SupplyCurrent", loggedSupplyCurrernt);
+            table.put("SupplyCurrent", loggedSupplyCurrent);
             table.put("Position", loggedPosition);
             table.put("Velocity", loggedVelocity);
             table.put("RotorVelocity", loggedRotorVelocity);
@@ -144,7 +144,7 @@ public class BulldogTalonFX {
 
           public void fromLog(LogTable table) {
             loggedAppliedVoltage = table.get("AppliedVoltage", 0);
-            loggedSupplyCurrernt = table.get("SupplyCurrent", 0);
+            loggedSupplyCurrent = table.get("SupplyCurrent", 0);
             loggedPosition = table.get("Position", 0);
             loggedVelocity = table.get("Velocity", 0);
             loggedRotorVelocity = table.get("RotorVelocity", 0);
@@ -162,7 +162,7 @@ public class BulldogTalonFX {
     kA = new BulldogTunableNumber(name + "/kA", slot0Configs.kA, enableTuning);
     kG = new BulldogTunableNumber(name + "/kG", slot0Configs.kG, enableTuning);
 
-    disconnectedAlert = new Alert(name + " disconnected!", AlertType.kWarning);
+    disconnectedAlert = new Alert(name + " disconnected!", AlertType.kError);
 
     allMotors.add(this);
   }
@@ -176,7 +176,7 @@ public class BulldogTalonFX {
     // If the logger DOES have a replay source, the logged values will be updated from the logs.
     if (!Logger.hasReplaySource()) {
       loggedAppliedVoltage = appliedVoltage.getValueAsDouble();
-      loggedSupplyCurrernt = supplyCurrent.getValueAsDouble();
+      loggedSupplyCurrent = supplyCurrent.getValueAsDouble();
       loggedPosition = position.getValueAsDouble();
       loggedVelocity = velocity.getValueAsDouble();
       loggedRotorVelocity = rotorVelocity.getValueAsDouble();
@@ -324,7 +324,7 @@ public class BulldogTalonFX {
    * @return The supply current, in Amps.
    */
   public double getSupplyCurrent() {
-    return loggedSupplyCurrernt;
+    return loggedSupplyCurrent;
   }
 
   /**
