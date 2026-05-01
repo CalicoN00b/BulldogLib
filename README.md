@@ -7,6 +7,7 @@ Library of code to be used for the convencience of FRC Team 5933: JudgeMent Call
 This library relies on some vendordeps that must also be present in the root robot directory in order to function:
 - Phoenix6
 - AdvantageKit
+- REVLib
 
 # Adding Repository as a Submodule
 
