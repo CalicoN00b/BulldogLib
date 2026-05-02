@@ -14,7 +14,7 @@ public class BulldogDeviceManager {
     /**
      * Registers a LoggableMotor to the device manager.
      * Registering a motor allows it to be included in {@link #updateRegisteredDevices}.
-     * @param motor
+     * @param motor The motor to register with the device manager.
      */
     public static void registerMotor(LoggableMotor motor) {
         if (registeredMotors.containsKey(motor.getID())) {
@@ -31,6 +31,12 @@ public class BulldogDeviceManager {
         registeredMotors.clear();
     }
 
+    /**
+     * Removes a registered LoggableMotor.
+     * @param key The CAN ID of the motor to remove.
+     * @return The LoggableMotor associated with the CAN ID.
+     *      If there is no LoggableMotor associated with the CAN ID, will return {@code null}.
+     */
     public static LoggableMotor removeRegisteredMotor(int key) {
         return registeredMotors.remove(key);
     }

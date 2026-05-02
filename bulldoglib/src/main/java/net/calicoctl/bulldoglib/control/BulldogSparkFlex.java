@@ -182,7 +182,7 @@ public class BulldogSparkFlex extends LoggableMotor {
 
     /**
      * Creates a copy of this BulldogSparkFlex with the applied IdleMode config.
-     * @param value {@code true} to enable brake mode, {@false} to enable coast mode.
+     * @param value {@code true} to enable brake mode, {@code false} to enable coast mode.
      * @return A copy of this BulldogSparkFlex with the desired IdleMode config.
      */
     public BulldogSparkFlex withBrakeMode(boolean value) {

@@ -75,15 +75,15 @@ If you are just cloning this repository on its own, you can generate and view th
 ```
 # Windows
 .\gradlew.bat javadoc
-start .\bulldoglib\build\docs\index.html
+start .\bulldoglib\build\docs\allpackages-index.html
 
 # Mac
 ./gradlew javadoc
-open ./bulldoglib/build/docs/index.html
+open ./bulldoglib/build/docs/allpackages-index.html
 
 # Linux
 ./gradlew javadoc
-<browser> ./bulldoglib/build/docs/index.html # Replace <browser> with your broswer of choice, such as firefox
+<browser> ./bulldoglib/build/docs/allpackages-index.html # Replace <browser> with your broswer of choice, such as firefox
 ```
 
 ## Generating Javadocs When Cloned as a Submodule
@@ -93,13 +93,13 @@ If you have followed the steps to add this repository as a submodule and to add 
 ```
 # Windows
 .\gradlew.bat :BulldogLib:bulldoglib:javadoc
-start .\BulldogLib\bulldoglib\build\docs\index.html
+start .\BulldogLib\bulldoglib\build\docs\allpackages-index.html
 
 # Mac
 ./gradlew javadoc
-open ./BulldogLib/bulldoglib/build/docs/index.html
+open ./BulldogLib/bulldoglib/build/docs/allpackages-index.html
 
 # Linux
 ./gradlew javadoc
-<browser> ./BulldogLib/bulldoglib/build/docs/index.html # Replace <browser> with your broswer of choice, such as firefox
+<browser> ./BulldogLib/bulldoglib/build/docs/allpackages-index.html # Replace <browser> with your broswer of choice, such as firefox
 ```

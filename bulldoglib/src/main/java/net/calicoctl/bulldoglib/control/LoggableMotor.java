@@ -51,7 +51,7 @@ public class LoggableMotor {
 
     /**
      * Sets the inputs of the LoggableMotor. MUST be called before calling {@link #update}.
-     * @param inputs
+     * @param inputs The inputs to give to the LoggableMotor.
      */
     protected void setInputs(LoggableInputs inputs) {
         if (inputs == null) this.inputs = Objects.requireNonNull(inputs, "Cannot give a LoggableMotor null inputs!");
