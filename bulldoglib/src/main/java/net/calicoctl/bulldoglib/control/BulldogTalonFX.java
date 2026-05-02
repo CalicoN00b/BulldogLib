@@ -73,7 +73,8 @@ public class BulldogTalonFX extends LoggableMotor {
    * @param name The name of the BulldogTalonFX.
    * @param config The configs to give to the TalonFX.
    * @param enableTuning Whether or not to enable tuning of the motor.
-   *    If enabled, will allow tuning of PID and Feedforward values.
+   *    If true, will allow tuning of PID and Feedforward values.
+   *    If false, will default to the PID and Feedforward values specified by the given config.
    * @throws IllegalArgumentException if the ID is not between [0, 62].
    * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
    * @throws NullPointerException if the config is null.
@@ -131,7 +132,7 @@ public class BulldogTalonFX extends LoggableMotor {
   /**
    * Updates and processes the inputs of the motor. Also will alert the user if the motor is disconnected.
    * <p>
-   * Called periodically (every loop) as part of {@link BulldogTalonFX#updateAllMotors}
+   * Called periodically (every loop) as part of {@link BulldogDeviceManager#updateRegisteredDevices}.
    */
   @Override
   protected void update() {
