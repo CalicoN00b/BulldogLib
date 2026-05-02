@@ -18,8 +18,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import net.calicoctl.bulldoglib.util.BulldogTunableNumber;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 import org.littletonrobotics.junction.LogTable;
@@ -33,9 +31,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  * <p>
  * If tuning is enabled for this motor, allows tuning of PID and Feedforward.
  */
-public class BulldogTalonFX {
-
-  private static final List<BulldogTalonFX> allMotors = new LinkedList<>();
+public class BulldogTalonFX extends LoggableMotor {
 
   /** 
    * The backing motor of this BulldogTalonFX.
@@ -58,10 +54,6 @@ public class BulldogTalonFX {
   private double loggedRotorVelocity;
   private double loggedTempurature;
   private boolean loggedConnected;
-
-  private final String name;
-
-  private final LoggableInputs inputs;
 
   private final BulldogTunableNumber kP;
   private final BulldogTunableNumber kI;
@@ -113,25 +105,9 @@ public class BulldogTalonFX {
    * @throws NullPointerException if the config is null.
    */
   public BulldogTalonFX(int id, String name, TalonFXConfiguration config, boolean enableTuning) {
-    if (id < 0 || id > 62) throw new IllegalArgumentException("CAN ID must be between [0, 62]!");
-    if (name == null || name.isBlank()) throw new IllegalArgumentException("A BulldogTalonFX must have a name!");
-    
-    this.config = Objects.requireNonNull(config, "Config must not be null!");
-
-    motor = new TalonFX(id);
-    appliedVoltage = motor.getMotorVoltage();
-    supplyCurrent = motor.getSupplyCurrent();
-    position = motor.getPosition();
-    velocity = motor.getVelocity();
-    rotorVelocity = motor.getRotorVelocity();
-    tempurature = motor.getDeviceTemp();
-
-    motor.getConfigurator().apply(this.config);
-
-    this.name = name;
-
-    inputs =
-        new LoggableInputs() {
+    super(name, id);
+    super.setInputs(
+      new LoggableInputs() {
           public void toLog(LogTable table) {
             table.put("AppliedVoltage", loggedAppliedVoltage);
             table.put("SupplyCurrent", loggedSupplyCurrent);
@@ -151,7 +127,20 @@ public class BulldogTalonFX {
             loggedTempurature = table.get("Tempurature", 0);
             loggedConnected = table.get("Connected", false);
           }
-        };
+        }
+    );
+    
+    this.config = Objects.requireNonNull(config, "Config must not be null!");
+
+    motor = new TalonFX(id);
+    appliedVoltage = motor.getMotorVoltage();
+    supplyCurrent = motor.getSupplyCurrent();
+    position = motor.getPosition();
+    velocity = motor.getVelocity();
+    rotorVelocity = motor.getRotorVelocity();
+    tempurature = motor.getDeviceTemp();
+
+    motor.getConfigurator().apply(this.config);
 
     Slot0Configs slot0Configs = this.config.Slot0;
     kP = new BulldogTunableNumber(name + "/kP", slot0Configs.kP, enableTuning);
@@ -163,8 +152,6 @@ public class BulldogTalonFX {
     kG = new BulldogTunableNumber(name + "/kG", slot0Configs.kG, enableTuning);
 
     disconnectedAlert = new Alert(name + " disconnected!", AlertType.kError);
-
-    allMotors.add(this);
   }
 
   /**
@@ -172,6 +159,7 @@ public class BulldogTalonFX {
    * <p>
    * Called periodically (every loop) as part of {@link BulldogTalonFX#updateAllMotors}
    */
+  @Override
   protected void update() {
     // If the logger DOES have a replay source, the logged values will be updated from the logs.
     if (!Logger.hasReplaySource()) {
@@ -184,7 +172,7 @@ public class BulldogTalonFX {
       loggedConnected = motor.isConnected();
     }
 
-    Logger.processInputs("Motors/" + name, inputs);
+    super.update();
 
     BulldogTunableNumber.ifChanged(
       hashCode(),

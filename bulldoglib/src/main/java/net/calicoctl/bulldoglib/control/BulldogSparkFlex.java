@@ -1,7 +1,5 @@
 package net.calicoctl.bulldoglib.control;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 import org.littletonrobotics.junction.LogTable;
@@ -25,19 +23,13 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import net.calicoctl.bulldoglib.util.BulldogTunableNumber;
 
-public class BulldogSparkFlex {
-
-    private static final List<BulldogSparkFlex> allMotors = new LinkedList<>();
+public class BulldogSparkFlex extends LoggableMotor {
 
     public final SparkFlex motor;
     private final SparkFlexConfig config;
 
     private final AbsoluteEncoder absoluteEncoder;
     private final RelativeEncoder relativeEncoder;
-
-    private final String name;
-
-    private final LoggableInputs inputs;
 
     private double loggedAppliedVoltage;
     private double loggedSupplyCurrent;
@@ -82,25 +74,9 @@ public class BulldogSparkFlex {
     }
 
     public BulldogSparkFlex(int id, String name, SparkFlexConfig config, MotorType motorType, boolean useAbsoluteEncoder, boolean enableTuning) {
-        if (id < 0 || id > 62) throw new IllegalArgumentException("CAN ID must be between [0, 62]!");
-        if (name == null || name.isBlank()) throw new IllegalArgumentException("A BulldogSparkFlex must have a name!");
-
-        this.config = Objects.requireNonNull(config, "Config must not be null!");
-
-        motor = new SparkFlex(id, Objects.requireNonNull(motorType, "Motor type must not be null!"));
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        if (useAbsoluteEncoder) {
-            absoluteEncoder = motor.getAbsoluteEncoder();
-            relativeEncoder = null;
-        } else {
-            absoluteEncoder = null;
-            relativeEncoder = motor.getEncoder();
-        }
-
-        this.name = name;
-
-        inputs = new LoggableInputs() {
+        super(name, id);
+        super.setInputs(
+            new LoggableInputs() {
             public void toLog(LogTable table) {
                 table.put("AppliedVoltage", loggedAppliedVoltage);
                 table.put("SupplyCurrent", loggedSupplyCurrent);
@@ -118,7 +94,21 @@ public class BulldogSparkFlex {
                 loggedTemperature = table.get("Tempurature", 0);
                 loggedHasActiveFault = table.get("HasActiveFault", false);
             }
-        };
+        }
+        );
+
+        this.config = Objects.requireNonNull(config, "Config must not be null!");
+
+        motor = new SparkFlex(id, Objects.requireNonNull(motorType, "Motor type must not be null!"));
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        if (useAbsoluteEncoder) {
+            absoluteEncoder = motor.getAbsoluteEncoder();
+            relativeEncoder = null;
+        } else {
+            absoluteEncoder = null;
+            relativeEncoder = motor.getEncoder();
+        }
 
         ClosedLoopConfigAccessor closedLoopConfigAccessor = motor.configAccessor.closedLoop;
         FeedForwardConfigAccessor feedForwardConfigAccessor = motor.configAccessor.closedLoop.feedForward;
@@ -131,10 +121,9 @@ public class BulldogSparkFlex {
         kG = new BulldogTunableNumber(name + "/kG", feedForwardConfigAccessor.getkG(), enableTuning);
 
         activeFaultAlert = new Alert(name + " has active fault(s)!", AlertType.kError);
-
-        allMotors.add(this);
     }
 
+    @Override
     protected void update() {
         if (!Logger.hasReplaySource()) {
             loggedAppliedVoltage = motor.getAppliedOutput() * motor.getBusVoltage();
@@ -145,7 +134,7 @@ public class BulldogSparkFlex {
             loggedHasActiveFault = motor.hasActiveFault();
         }
 
-        Logger.processInputs("Motors/" + name, inputs);
+        super.update();
 
         BulldogTunableNumber.ifChanged(
             hashCode(), 
@@ -155,6 +144,8 @@ public class BulldogSparkFlex {
                 config.closedLoop.feedForward.kV(values[4]);
                 config.closedLoop.feedForward.kA(values[5]);
                 config.closedLoop.feedForward.kG(values[6]);
+
+                motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
             },
             kP, kI, kD, kS, kV, kA, kG
         );
