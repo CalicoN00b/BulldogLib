@@ -67,32 +67,6 @@ public class BulldogTalonFX extends LoggableMotor {
   private final Debouncer alertDebouncer = new Debouncer(0.5, DebounceType.kFalling);
 
   /**
-   * Creates a new BulldogTalonFX Wrapper with the given ID, a default name, and default configs.
-   *
-   * @param id The ID of the TalonFX.
-   * @throws IllegalArgumentException if the ID is not between [0, 62].
-   */
-  public BulldogTalonFX(int id) {
-    this(id, "Motor" + id);
-  }
-
-  /**
-   * Creates a new BulldogTalonFX Wrapper with the given ID, the given name, and default configs.
-   *
-   * @param id The ID of the TalonFX.
-   * @param name The name of the BulldogTalonFX.
-   * @throws IllegalArgumentException if the ID is not between [0, 62].
-   * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
-   */
-  public BulldogTalonFX(int id, String name) {
-    this(id, name, new TalonFXConfiguration());
-  }
-
-  public BulldogTalonFX(int id, String name, TalonFXConfiguration config) {
-    this(id, name, config, false);
-  }
-
-  /**
    * Creates a new BulldogTalonFX Wrapper with the given ID, the given name, and the given configs.
    *
    * @param id The ID of the TalonFX.

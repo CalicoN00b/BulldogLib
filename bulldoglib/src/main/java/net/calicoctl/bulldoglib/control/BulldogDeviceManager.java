@@ -18,9 +18,21 @@ public class BulldogDeviceManager {
      */
     public static void registerMotor(LoggableMotor motor) {
         if (registeredMotors.containsKey(motor.getID())) {
-            throw new IllegalArgumentException(String.format("Cannot register %s, as %s is already registered to CAN ID $d!", motor.getName(), registeredMotors.get(motor.getID()), motor.getID()));
+            throw new IllegalArgumentException(String.format("Cannot register %s, as %s is already registered to CAN ID %d!", motor.getName(), registeredMotors.get(motor.getID()).getName(), motor.getID()));
         }
         registeredMotors.put(motor.getID(), motor);
+    }
+
+    /**
+     * Clears all registered motors from the device manager.
+     * Does not affect any other types of registered devices.
+     */
+    public static void clearRegisteredMotors() {
+        registeredMotors.clear();
+    }
+
+    public static LoggableMotor removeRegisteredMotor(int key) {
+        return registeredMotors.remove(key);
     }
 
     /**

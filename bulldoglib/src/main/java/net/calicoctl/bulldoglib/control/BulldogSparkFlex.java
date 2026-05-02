@@ -23,8 +23,19 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import net.calicoctl.bulldoglib.util.BulldogTunableNumber;
 
+/**
+ * A wrapper class for {@link SparkFlex}.
+ * Uses the <a href="https://github.com/Mechanical-Advantage/AdvantageKit">AdvantageKit</a> library to log many aspects of the motor,
+ * and will automatically alert the user if a motor has active faults.
+ * <p>
+ * If tuning is enabled for this motor, allows tuning of PID and Feedforward.
+ */
 public class BulldogSparkFlex extends LoggableMotor {
 
+    /**
+     * The backing motor of the BulldogSparkFlex.
+     * Should only be used for scenarios that BulldogLib has not accounted for.
+     */
     public final SparkFlex motor;
     private final SparkFlexConfig config;
 
@@ -48,30 +59,6 @@ public class BulldogSparkFlex extends LoggableMotor {
 
     private final Alert activeFaultAlert;
     private final Debouncer alertDebouncer = new Debouncer(0.5, DebounceType.kFalling);
-
-    public BulldogSparkFlex(int id) {
-        this(id, "Motor" + id, new SparkFlexConfig(), MotorType.kBrushless, false, false);
-    }
-
-    public BulldogSparkFlex(int id, MotorType motorType) {
-        this(id, "Motor" + id, new SparkFlexConfig(), motorType, false, false);
-    }
-
-    public BulldogSparkFlex(int id, String name) {
-        this(id, name, new SparkFlexConfig(), MotorType.kBrushless, false, false);
-    }
-
-    public BulldogSparkFlex(int id, String name, MotorType motorType) {
-        this(id, name, new SparkFlexConfig(), motorType, false, false);
-    }
-
-    public BulldogSparkFlex(int id, String name, SparkFlexConfig config) {
-        this(id, name, config, MotorType.kBrushless, false, false);
-    }
-
-    public BulldogSparkFlex(int id, String name, SparkFlexConfig config, MotorType motorType) {
-        this(id, name, config, motorType, false, false);
-    }
 
     public BulldogSparkFlex(int id, String name, SparkFlexConfig config, MotorType motorType, boolean useAbsoluteEncoder, boolean enableTuning) {
         super(name, id);
