@@ -77,6 +77,7 @@ public class BulldogTalonFX extends LoggableMotor {
    *    If false, will default to the PID and Feedforward values specified by the given config.
    * @throws IllegalArgumentException if the ID is not between [0, 62].
    * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
+   * @throws IllegalArgumentException if another device has already been registered with the same CAN ID or name.
    * @throws NullPointerException if the config is null.
    */
   public BulldogTalonFX(int id, String name, TalonFXConfiguration config, boolean enableTuning) {
@@ -105,7 +106,13 @@ public class BulldogTalonFX extends LoggableMotor {
         }
     );
     
-    this.config = Objects.requireNonNull(config, "Config must not be null!");
+    if (config == null) {
+      // If we got this far the motor has been registered, so we need to unregister it.
+      BulldogDeviceManager.removeRegisteredMotor(id);
+      throw new NullPointerException("Configs must not be null!");
+    }
+
+    this.config = config;
 
     motor = new TalonFX(id);
     appliedVoltage = motor.getMotorVoltage();

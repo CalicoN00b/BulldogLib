@@ -98,9 +98,18 @@ public class BulldogSparkFlex extends LoggableMotor {
         }
         );
 
-        this.config = Objects.requireNonNull(config, "Config must not be null!");
+        if (config == null) {
+            BulldogDeviceManager.removeRegisteredMotor(id);
+            throw new NullPointerException("Config must not be null!");
+        }
+        this.config = config;
 
-        motor = new SparkFlex(id, Objects.requireNonNull(motorType, "Motor type must not be null!"));
+        if (motorType == null) {
+            BulldogDeviceManager.removeRegisteredMotor(id);
+            throw new NullPointerException("MotorType must not be null!");
+        }
+
+        motor = new SparkFlex(id, motorType);
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         if (useAbsoluteEncoder) {
@@ -166,6 +175,7 @@ public class BulldogSparkFlex extends LoggableMotor {
      * @return A copy of this BulldogSparkFlex, following the motor at the given ID.
      */
     public BulldogSparkFlex withLeader(int leaderID, boolean opposeLeader) {
+        if (leaderID == motor.getDeviceId()) throw new IllegalArgumentException("A motor cannot follow itself!");
         config.follow(leaderID, opposeLeader);
         return this;
     }
@@ -177,7 +187,7 @@ public class BulldogSparkFlex extends LoggableMotor {
      * @return A copy of this BulldogSparkFlex, following the motor at the given ID.
      */
     public BulldogSparkFlex withLeader(BulldogSparkFlex leaderMotor, boolean opposeLeader) {
-        return this.withLeader(leaderMotor.motor.getDeviceId(), opposeLeader);
+        return this.withLeader(Objects.requireNonNull(leaderMotor, "Cannot follow a null motor!").getID(), opposeLeader);
     }
 
     /**

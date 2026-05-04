@@ -21,7 +21,7 @@ public class LoggableMotor {
      * @param id The CAN ID to give to the LoggableMotor
      * @throws IllegalArgumentException CAN ID is not between 0 and 62, inclusive.
      * @throws IllegalArgumentException Name is null, empty, or contains only whitespace characters.
-     * @throws IllegalArgumentException A LoggableMotor has already been registered with the desired CAN ID.
+     * @throws IllegalArgumentException A LoggableMotor has already been registered with the desired CAN ID or name.
      */
     protected LoggableMotor(String name, int id) {
         if (id < 0 || id > 62) throw new IllegalArgumentException("CAN ID of a LoggableMotor must be between 0 and 62, inclusive!");
