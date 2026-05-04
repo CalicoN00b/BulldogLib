@@ -9,7 +9,9 @@ import java.util.HashMap;
  */
 public class BulldogDeviceManager {
 
+    // All CAN IDs must go to unique devices with unique names.
     private static HashMap<Integer, LoggableMotor> registeredMotors = new HashMap<>();
+    private static HashMap<Integer, String> motorNames = new HashMap<>();
 
     /**
      * Registers a LoggableMotor to the device manager.
@@ -20,7 +22,13 @@ public class BulldogDeviceManager {
         if (registeredMotors.containsKey(motor.getID())) {
             throw new IllegalArgumentException(String.format("Cannot register %s, as %s is already registered to CAN ID %d!", motor.getName(), registeredMotors.get(motor.getID()).getName(), motor.getID()));
         }
+        
+        if (motorNames.containsValue(motor.getName())) {
+            throw new IllegalArgumentException(String.format("Cannot register %s, as another device is already registered to that name!", motor.getName()));
+        }
+
         registeredMotors.put(motor.getID(), motor);
+        motorNames.put(motor.getID(), motor.getName());
     }
 
     /**
@@ -29,6 +37,7 @@ public class BulldogDeviceManager {
      */
     public static void clearRegisteredMotors() {
         registeredMotors.clear();
+        motorNames.clear();
     }
 
     /**
@@ -38,6 +47,7 @@ public class BulldogDeviceManager {
      *      If there is no LoggableMotor associated with the CAN ID, will return {@code null}.
      */
     public static LoggableMotor removeRegisteredMotor(int key) {
+        motorNames.remove(key);
         return registeredMotors.remove(key);
     }
 
