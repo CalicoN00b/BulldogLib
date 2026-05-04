@@ -17,6 +17,8 @@ public class BulldogDeviceManager {
      * Registers a LoggableMotor to the device manager.
      * Registering a motor allows it to be included in {@link #updateRegisteredDevices}.
      * @param motor The motor to register with the device manager.
+     * @throws IllegalArgumentException if trying to register a motor under an already registered CAN ID.
+     * @throws IllegalArgumentException if trying to register a motor under an already registered name.
      */
     public static void registerMotor(LoggableMotor motor) {
         if (registeredMotors.containsKey(motor.getID())) {

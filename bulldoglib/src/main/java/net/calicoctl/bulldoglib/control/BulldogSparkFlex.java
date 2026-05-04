@@ -73,6 +73,11 @@ public class BulldogSparkFlex extends LoggableMotor {
      * @param enableTuning Whether or not to enable tuning of the motor.
      *      If true, will enable tuning of PID and Feedforward values.
      *      If false, will default to the PID and Feedforward values specified by the given configs.
+     * @throws IllegalArgumentException if the ID is not between 0 and 62, inclusive.
+     * @throws IllegalArgumentException if the name is null, empty, or contains only whitespace characters.
+     * @throws IllegalArgumentException if another device has already been registered under the same ID or name.
+     * @throws NullPointerException if the config is null.
+     * @throws NullPointerException if the motorType is null.
      */
     public BulldogSparkFlex(int id, String name, SparkFlexConfig config, MotorType motorType, boolean useAbsoluteEncoder, boolean enableTuning) {
         super(name, id);
@@ -173,6 +178,7 @@ public class BulldogSparkFlex extends LoggableMotor {
      * @param leaderID The CAN ID of the motor to follow.
      * @param opposeLeader {@code true} to oppose the output of the leader, {@code false} to align to the output of the leader.
      * @return A copy of this BulldogSparkFlex, following the motor at the given ID.
+     * @throws IllegalArgumentException if the leaderID has the same id as the backing motor.
      */
     public BulldogSparkFlex withLeader(int leaderID, boolean opposeLeader) {
         if (leaderID == motor.getDeviceId()) throw new IllegalArgumentException("A motor cannot follow itself!");
@@ -185,6 +191,8 @@ public class BulldogSparkFlex extends LoggableMotor {
      * @param leaderMotor The BulldogSparkFlex to follow.
      * @param opposeLeader {@code true} to oppose the output of the leader, {@code false} to align to the output of the leader.
      * @return A copy of this BulldogSparkFlex, following the motor at the given ID.
+     * @throws IllegalArgumentException if the motor is trying to follow itself.
+     * @throws NullPointerException if trying to follow a null motor.
      */
     public BulldogSparkFlex withLeader(BulldogSparkFlex leaderMotor, boolean opposeLeader) {
         return this.withLeader(Objects.requireNonNull(leaderMotor, "Cannot follow a null motor!").getID(), opposeLeader);
